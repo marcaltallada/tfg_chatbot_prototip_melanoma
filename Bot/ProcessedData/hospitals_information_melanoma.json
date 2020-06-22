@@ -1,0 +1,26 @@
+[
+    {
+        "lat": 41.3843547,
+        "lon": 2.1019053154910337,
+        "name": "Hospital Sant Joan de Déu Barcelona\n",
+        "country": "España"
+    },
+    {
+        "lat": 38.3632372,
+        "lon": -0.48591021612544627,
+        "name": "Hospital General Universitario de Alicante\n",
+        "country": "España"
+    },
+    {
+        "lat": 39.4434289,
+        "lon": -0.376040401988849,
+        "name": "Hospital Universitari i Politècnic La Fe\n",
+        "country": "España"
+    },
+    {
+        "lat": 37.3754769,
+        "lon": -5.9989719,
+        "name": "Hospital Jimenez Diaz Madrid\n",
+        "country": "España"
+    }
+]
