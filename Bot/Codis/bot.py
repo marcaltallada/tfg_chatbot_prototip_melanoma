@@ -1,4 +1,3 @@
-
 # THE ONLY THING YOU NEED TO CHANGE IN THIS FILE IS INTRODUCING THE NEW DISEASES
 # IN THE LIST diseases.
 
@@ -81,11 +80,14 @@ def onMessage(bot, update, user_data):
                 if i in msg:
                     data = read_book("main_data_"+i+".json")
                     information_hospitals = read_book('hospitals_information_'+i+'.json')
-                    message = "Perfect!. I understood you asked about "+i+". From now on we will be talking about this disease in particular."
-                    message2 = "If I did not get it right, or you want to change the subject, you can type /disease and I will ask again."
+                    message = "Perfect!. I understand you asked about "+i+". From now on we will be talking about this disease in particular."
+                    message2a = "If I did not understand it wel, or you wish to change the subject, you can type"
+                    message2b = "and I will ask again."
                     bot.send_message(chat_id=update.message.chat_id, text = tr2other(message, user_data['language']))
-                    bot.send_message(chat_id=update.message.chat_id, text = tr2other(message2, user_data['language']))
-                    bot.send_message(chat_id=update.message.chat_id, text = tr2other('You can ask me anything related to this disease.', user_data['language']))
+                    bot.send_message(chat_id=update.message.chat_id, text = tr2other(message2a, user_data['language'])+' /disease '+tr2other(message2b, user_data['language']) )
+                    bot.send_message(chat_id=update.message.chat_id, text = tr2other('You can ask me any question related to this disease.', user_data['language']))
+                    bot.send_message(chat_id=update.message.chat_id, text = tr2other('You can also send me your location and I will find the closest hospital where this disease can be diagnosed and treated.', user_data['language']))
+                    bot.send_message(chat_id=update.message.chat_id, text = tr2other('You can type in', user_data['language'])+' /help '+tr2other('To know about all the text commands.', user_data['language']))
                     specified_disease = True
                     return
                 else:
@@ -143,7 +145,7 @@ def giveClosestHospital(bot, update, user_data):
 
         text = "This is the location of the nearest hospital in you country in which this disease can be treated.\nThis hospital is " + closest_hospital.address
         bot.send_message(chat_id=update.message.chat_id, text=tr2other(text, user_data['language']))
-        bot.send_message(chat_id=update.message.chat_id, text=tr2other('If you wish to know about more hospitals in your country that can treat this disease, you can type in /AllHospitals for a full list of them.', user_data['language']))
+        bot.send_message(chat_id=update.message.chat_id, text=tr2other('If you wish to know about more hospitals in your country that can treat this disease, you can type in ', user_data['language'])+' \AllHospitals '+tr2other('for a full list of them.', user_data['language']))
     except Exception as e:
         print(e)
 
@@ -160,30 +162,35 @@ def findHospitalsCountry(lat, long):
     return list
 
 
-
-def disease(bot, update):
+def disease(bot, update, user_data):
     global specified_disease
     specified_disease = False
-    bot.send_message(chat_id=update.message.chat_id, text='Reset! Now please tell me which other disease you want to find out about.')
+    bot.send_message(chat_id=update.message.chat_id, text=tr2other('Reset! Now please tell me which other disease you want to find out about.', user_data['language']))
 
-
-def start(bot, update):
+def start(bot, update, user_data):
     bot.send_message(chat_id=update.message.chat_id, text='Hello! Hola! Bonjour!')
     bot.send_message(chat_id=update.effective_chat.id, text='You can talk to me in any language you want, I understand all of them! Please send a text in you language so that I can learn it.')
     bot.send_message(chat_id=update.effective_chat.id, text='Puedes hablar conmigo en el idioma que quieras, ¡los entiendo a todos! Por favor envíe un texto en su idioma para que pueda aprenderlo.')
+    del user_data['language']
     first=True
 
 def allhosp(bot, update):
     global lat
-    global long
-    a=findHospitalsCountry(lat, long)
+    global lon
+    a=findHospitalsCountry(lat, lon)
     for i in a:
-        location=geolocator.geocode(i[1])
+        location=geolocator.geocode(i[1].strip("\n"))
+        text=str(location)
+        print(text)
         address = geolocator.reverse(location.latitude, location.longitude ).address
-        print(address)
-        bot.send_message(chat_id=update.message.chat_id, text = address)
+        bot.send_message(chat_id=update.message.chat_id, text = text)
     pass
 
+def help(bot, update, user_data):
+    bot.send_message(chat_id=update.message.chat_id, text=tr2other('You can use the following commands.',  user_data['language']))
+    bot.send_message(chat_id=update.message.chat_id, text='/start : ' + tr2other('To change the language.',  user_data['language']))
+    bot.send_message(chat_id=update.message.chat_id, text='/disease : ' + tr2other('To change the disease you want information about.',  user_data['language']))
+    bot.send_message(chat_id=update.message.chat_id, text='/AllHospitals : ' + tr2other('To know the full list of hospitals in your country that can diagnose and treat the selected disease.',  user_data['language']))
 
 
 TOKEN = open('./token.txt').read().rstrip()
@@ -192,8 +199,9 @@ updater = Updater(token=TOKEN)
 dispatcher = updater.dispatcher
 
 dispatcher.add_handler(CommandHandler('AllHospitals', allhosp))
-dispatcher.add_handler(CommandHandler('disease', disease))
-dispatcher.add_handler(CommandHandler('start', start))
+dispatcher.add_handler(CommandHandler('disease', disease, pass_user_data=True))
+dispatcher.add_handler(CommandHandler('start', start, pass_user_data=True))
+dispatcher.add_handler(CommandHandler('help', help, pass_user_data=True))
 
 dispatcher.add_handler(MessageHandler(Filters.text, onMessage, pass_user_data=True))
 dispatcher.add_handler(MessageHandler(Filters.location, giveClosestHospital, pass_user_data=True))
