@@ -112,7 +112,7 @@ def onMessage(bot, update, user_data):
             message = tr2other('Okay, give me some time to think about it...', user_data['language'])
             bot.send_message(chat_id=update.message.chat_id, text = message, parse_mode = telegram.ParseMode.MARKDOWN)
 
-            info = process_message(update.message['text'], data)
+            info = process_message(msg, data)
             if info:
                 source_message = f"In case you want more information about it, the information I found comes from this source:\n `{info['URL']}` \n From the section *{info['title']}*"
                 answer = f"Alright! I found the following information: \n \n {info['text']}"
@@ -145,7 +145,7 @@ def giveClosestHospital(bot, update, user_data):
 
         text = "This is the location of the nearest hospital in you country in which this disease can be treated.\nThis hospital is " + closest_hospital.address
         bot.send_message(chat_id=update.message.chat_id, text=tr2other(text, user_data['language']))
-        bot.send_message(chat_id=update.message.chat_id, text=tr2other('If you wish to know about more hospitals in your country that can treat this disease, you can type in ', user_data['language'])+' \AllHospitals '+tr2other('for a full list of them.', user_data['language']))
+        bot.send_message(chat_id=update.message.chat_id, text=tr2other('If you wish to know about more hospitals in your country that can treat this disease, you can type in ', user_data['language'])+' /AllHospitals '+tr2other('for a full list of them.', user_data['language']))
     except Exception as e:
         print(e)
 
@@ -168,6 +168,7 @@ def disease(bot, update, user_data):
     bot.send_message(chat_id=update.message.chat_id, text=tr2other('Reset! Now please tell me which other disease you want to find out about.', user_data['language']))
 
 def start(bot, update, user_data):
+    global first
     bot.send_message(chat_id=update.message.chat_id, text='Hello! Hola! Bonjour!')
     bot.send_message(chat_id=update.effective_chat.id, text='You can talk to me in any language you want, I understand all of them! Please send a text in you language so that I can learn it.')
     bot.send_message(chat_id=update.effective_chat.id, text='Puedes hablar conmigo en el idioma que quieras, ¡los entiendo a todos! Por favor envíe un texto en su idioma para que pueda aprenderlo.')
